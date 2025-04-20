@@ -245,7 +245,7 @@
     const db = firebase.database();
     const auth = firebase.auth();
 
-auth.onAuthStateChanged(user => {
+    auth.onAuthStateChanged(user => {
   const btn = document.getElementById('login-button');
 
   if (user) {
@@ -255,6 +255,11 @@ auth.onAuthStateChanged(user => {
     btn.onclick = () => {
       auth.signOut();
     };
+
+    // Allow adding printers/filaments
+    document.getElementById('add-printer-form').style.display = 'block';
+    document.getElementById('add-filament-form').style.display = 'block';
+
   } else {
     // No user → show “Login”
     btn.textContent = 'Login';
@@ -263,12 +268,16 @@ auth.onAuthStateChanged(user => {
       document.getElementById('login-modal').style.display = 'block';
       document.getElementById('modal-overlay').style.display = 'block';
     };
+
+    // Hide adding printers/filaments
+    document.getElementById('add-printer-form').style.display = 'none';
+    document.getElementById('add-filament-form').style.display = 'none';
   }
 
   printersRef.once('value', snap => populatePrintersList(Object.values(snap.val() || {})));
   filamentsRef.once('value', snap => populateFilamentsList(Object.values(snap.val() || {})));
-
 });
+
     const printersRef = db.ref('printers');
     const filamentsRef = db.ref('filaments');
     const $ = id => document.getElementById(id);
