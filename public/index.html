@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>3D Printing Cost Calculator</title>
@@ -25,7 +27,7 @@
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      font-family: 'Segoe UI', Tahoma, sans-serif;
+      font-family: 'Poppins', sans-serif;
       background: var(--bg-color);
       color: var(--text-color);
       display: flex;
@@ -122,18 +124,47 @@
       width: 100%; padding: 8px; margin-bottom: 12px;
       border: 1px solid #ccc; border-radius: var(--radius);
     }
+    @media (max-width: 600px) {
+  .container {
+    width: 95%;
+    margin-top: 20px;
+  }
+  nav button {
+    font-size: 0.9rem;
+    padding: 12px;
+  }
+}
+
   </style>
 </head>
 
 <body>
   <div id="modal-overlay"></div>
-  <div id="login-modal">
-    <h3>Login</h3>
-    <input type="email" id="login-email" placeholder="Email" required>
-    <input type="password" id="login-password" placeholder="Password" required>
-    <p id="login-error" style="color:red; font-size:0.9rem; margin:8px 0;"></p>
-    <button id="submit-login" class="primary">Submit</button>
+  <div id="loading-spinner" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:10000; font-size:1.5rem; background:rgba(0,0,0,0.7); color:white; padding:20px 30px; border-radius:8px;">
+    Loading...
   </div>
+
+<!-- LOGOUT MODAL OUTSIDE -->
+<div id="logout-modal" style="display:none;">
+  <div style="background:#fff; padding:24px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.3); position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:1001;">
+    <h3 style="margin-top:0; color:#222126;">Confirm Logout</h3>
+    <p>Are you sure you want to logout?</p>
+    <div style="margin-top:20px; display:flex; justify-content:space-between;">
+      <button id="confirm-logout" class="primary" style="width:45%;">Yes</button>
+      <button id="cancel-logout" class="primary" style="background:#ccc; color:#000; width:45%;">No</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN MODAL -->
+<div id="login-modal">
+  <h3>Login</h3>
+  <input type="email" id="login-email" placeholder="Email" required>
+  <input type="password" id="login-password" placeholder="Password" required>
+  <p id="login-error" style="color:red; font-size:0.9rem; margin:8px 0;"></p>
+  <button id="submit-login" class="primary">Submit</button>
+</div>
+
 
   <div class="container">
     <header>
@@ -219,8 +250,29 @@
       </table>
       <form id="add-filament-form">
         <fieldset><legend>Add Filament</legend>
-          <label>Type</label><input type="text" id="new-filament-type" required>
-          <label>Brand</label><input type="text" id="new-filament-brand" required>
+          <label>Brand</label>
+<select id="new-filament-brand" required>
+  <option value="">Select a brand</option>
+  <option value="ELEGOO">Elegoo</option>
+  <option value="Polymaker">Polymaker</option>
+  <option value="Prusa">Prusa</option>
+  <option value="Esun">Esun</option>
+  <option value="Sunlu">Sunlu</option>
+  <option value="Bambu Lab">Bambu Lab</option>
+  <option value="Creality">Creality</option>
+  <option value="Anycubic">Anycubic</option>
+  <option value="Eryone">Eryone</option>
+  <option value="Kingroon">Kingroon</option>
+  <option value="Hatchbox">Hatchbox</option>
+  <option value="Overture">Overture</option>
+</select>
+<label>Type</label>
+<select id="new-filament-type" required>
+  <option value="">Select a brand first</option>
+</select>
+
+          
+
           <label>Cost per spool ($)</label>
 <input type="number" id="new-filament-cost" step="0.01" required>
           <button type="submit" class="primary">Add Filament</button>
@@ -249,64 +301,109 @@
   const btn = document.getElementById('login-button');
 
   if (user) {
-    // User is signed in → show “Logout”
-    btn.textContent = 'Logout';
-    btn.disabled = false;
-    btn.onclick = () => {
-      auth.signOut();
-    };
+  // User is signed in → show “Logout”
+  btn.textContent = 'Logout';
+  btn.disabled = false;
+  btn.onclick = () => {
+    document.getElementById('login-modal').style.display = 'none';  // 🛠
+    document.getElementById('logout-modal').style.display = 'block';
+    document.getElementById('modal-overlay').style.display = 'block';
+  };
 
-    // Allow adding printers/filaments
     document.getElementById('add-printer-form').style.display = 'block';
     document.getElementById('add-filament-form').style.display = 'block';
-
   } else {
-    // No user → show “Login”
     btn.textContent = 'Login';
     btn.disabled = false;
     btn.onclick = () => {
       document.getElementById('login-modal').style.display = 'block';
       document.getElementById('modal-overlay').style.display = 'block';
     };
-
-    // Hide adding printers/filaments
     document.getElementById('add-printer-form').style.display = 'none';
     document.getElementById('add-filament-form').style.display = 'none';
   }
 
   printersRef.once('value', snap => populatePrintersList(Object.values(snap.val() || {})));
   filamentsRef.once('value', snap => populateFilamentsList(Object.values(snap.val() || {})));
+  // Show and hide spinner
+function showSpinner() {
+  document.getElementById('loading-spinner').style.display = 'block';
+}
+function hideSpinner() {
+  document.getElementById('loading-spinner').style.display = 'none';
+}
+
 });
 
-    const printersRef = db.ref('printers');
-    const filamentsRef = db.ref('filaments');
-    const $ = id => document.getElementById(id);
+// Logout modal button actions
+document.getElementById('confirm-logout').addEventListener('click', () => {
+  firebase.auth().signOut();
+  document.getElementById('logout-modal').style.display = 'none';
+  document.getElementById('modal-overlay').style.display = 'none';
+});
 
-    // Login modal logic
-    $('login-button').addEventListener('click', () => {
-        $('login-error').textContent = '';
-      $('login-modal').style.display = 'block';
-      $('modal-overlay').style.display = 'block';
-    });
-    $('modal-overlay').addEventListener('click', () => {
-      $('login-modal').style.display = 'none';
-      $('modal-overlay').style.display = 'none';
-    });
-    $('submit-login').addEventListener('click', () => {
-  const email = $('login-email').value;
-  const password = $('login-password').value;
-
-  auth.signInWithEmailAndPassword(email, password)
+document.getElementById('cancel-logout').addEventListener('click', () => {
+  document.getElementById('logout-modal').style.display = 'none';
+  document.getElementById('modal-overlay').style.display = 'none';
+});
+// 🛠 LOGIN BUTTON ACTION (Missing!)
+document.getElementById('submit-login').addEventListener('click', () => {
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
+  
+  firebase.auth().signInWithEmailAndPassword(email, password)
     .then(() => {
-      $('login-modal').style.display = 'none';
-      $('modal-overlay').style.display = 'none';
-      $('login-error').textContent = ''; // Clear error after successful login
+      document.getElementById('login-modal').style.display = 'none';
+      document.getElementById('modal-overlay').style.display = 'none';
+      document.getElementById('login-error').textContent = '';
     })
-    .catch(err => {
-      // Show a simple message in red below input — NO alert
-      $('login-error').textContent = 'Wrong email or password.';
+    .catch(error => {
+      document.getElementById('login-error').textContent = 'Wrong email or password.';
     });
 });
+
+
+
+const printersRef = db.ref('printers');
+const filamentsRef = db.ref('filaments');
+const $ = id => document.getElementById(id);
+
+// 🛠️ ADD THIS RIGHT AFTER
+const brandTypes = {
+  "Bambu Lab": ["PLA Basic", "PLA Matte", "PETG Basic", "PETG Matte", "ABS Basic", "ASA Basic", "PC", "PA", "PA-CF", "PVA"],
+  "ELEGOO": ["PLA", "ABS", "PETG"],
+  "Polymaker": ["PolyLite PLA", "PolyMax PLA", "PolyTerra PLA", "PolyLite PETG", "PolyMax PETG", "PolyLite ABS"],
+  "Prusa": ["Prusament PLA", "Prusament PETG", "Prusament ASA"],
+  "Esun": ["PLA+", "PETG", "ABS+", "TPU", "eSilk-PLA"],
+  "Sunlu": ["PLA", "PETG", "ABS", "TPU"],
+  "Creality": ["Ender PLA", "Ender PETG", "Ender ABS"],
+  "Anycubic": ["PLA", "PETG", "ABS", "TPU"],
+  "Eryone": ["PLA", "PETG", "TPU"],
+  "Kingroon": ["PLA", "PETG"],
+  "Hatchbox": ["PLA", "ABS", "PETG", "Wood PLA"],
+  "Overture": ["PLA", "PETG", "TPU", "ABS"]
+};
+
+document.getElementById('new-filament-brand').addEventListener('change', function() {
+  const brand = this.value;
+  const typeSelect = document.getElementById('new-filament-type');
+  typeSelect.innerHTML = ''; // Clear previous options
+
+  if (brand && brandTypes[brand]) {
+    brandTypes[brand].forEach(type => {
+      const option = document.createElement('option');
+      option.value = type;
+      option.textContent = type;
+      typeSelect.appendChild(option);
+    });
+  } else {
+    const option = document.createElement('option');
+    option.value = '';
+    option.textContent = 'Select a brand first';
+    typeSelect.appendChild(option);
+  }
+});
+
 
     // Tabs
     function showTab(tabId) {
