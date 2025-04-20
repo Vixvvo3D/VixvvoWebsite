@@ -185,8 +185,26 @@
           <legend>Printer & Filament</legend>
           <label for="printer-select">Printer Type</label>
           <select id="printer-select"></select>
-          <label for="filament-select">Filament Type</label>
-          <select id="filament-select"></select>
+          <label for="filament-brand-select">Filament Brand</label>
+<select id="filament-brand-select">
+  <option value="">Select a brand</option>
+  <option value="Bambu Lab">Bambu Lab</option>
+  <option value="ELEGOO">ELEGOO</option>
+  <option value="Polymaker">Polymaker</option>
+  <option value="Prusa">Prusa</option>
+  <option value="Esun">Esun</option>
+  <option value="Sunlu">Sunlu</option>
+  <option value="Creality">Creality</option>
+  <option value="Anycubic">Anycubic</option>
+  <option value="Eryone">Eryone</option>
+  <option value="Kingroon">Kingroon</option>
+  <option value="Hatchbox">Hatchbox</option>
+  <option value="Overture">Overture</option>
+</select>
+<label for="filament-select">Filament Type</label>
+<select id="filament-select">
+  <option value="">Select a brand first</option>
+</select>
         </fieldset>
         <fieldset>
           <legend>Print Parameters</legend>
@@ -223,6 +241,7 @@
         <button type="button" id="calculate-button" class="primary">Calculate</button>
       </form>
       <div id="results" class="results"></div>
+      
     </div>
 
     <!-- Printers Tab -->
@@ -233,9 +252,125 @@
         <tbody id="printer-table"></tbody>
       </table>
       <form id="add-printer-form">
-        <fieldset><legend>Add Printer</legend>
-          <label>Name</label><input type="text" id="new-printer-name" required>
-          <label>Cost per hour ($)</label><input type="number" id="new-printer-cost" step="0.001" required>
+        <fieldset>
+          <legend>Add Printer</legend>
+          <label>Printer Name</label>
+          <select id="new-printer-name" required>
+            <option value="">Select a printer</option>
+            <optgroup label="Bambu Lab">
+              <option value="A1 Combo">A1 Combo</option>
+              <option value="A1 Mini Combo">A1 Mini Combo</option>
+              <option value="X1 Carbon">X1 Carbon</option>
+              <option value="P1S">P1S</option>
+              <option value="H2D">H2D</option>
+            </optgroup>
+            <optgroup label="Prusa Research">
+              <option value="MK4S">MK4S</option>
+              <option value="Core One">Core One</option>
+              <option value="MINI+">MINI+</option>
+              <option value="XL">XL</option>
+              <option value="SL1S">SL1S</option>
+              <option value="Pro HT90">Pro HT90</option>
+              <option value="Pro SLX">Pro SLX</option>
+            </optgroup>
+            <optgroup label="Creality">
+              <option value="K2 Plus">K2 Plus</option>
+              <option value="K1C">K1C</option>
+              <option value="Ender-3 V3 SE">Ender-3 V3 SE</option>
+              <option value="Ender-3 V3">Ender-3 V3</option>
+              <option value="Ender-3 V3 Plus">Ender-3 V3 Plus</option>
+              <option value="Halot-Mage S 14K">Halot-Mage S 14K</option>
+              <option value="K1 Max">K1 Max</option>
+              <option value="CR-10">CR-10</option>
+            </optgroup>
+            <optgroup label="Anycubic">
+              <option value="Kobra 2 Max">Kobra 2 Max</option>
+              <option value="Kobra 3 Combo">Kobra 3 Combo</option>
+              <option value="Kobra S1">Kobra S1</option>
+              <option value="Photon Mono M7 Pro">Photon Mono M7 Pro</option>
+              <option value="Photon Mono X 6Ks">Photon Mono X 6Ks</option>
+              <option value="Photon Mono 2">Photon Mono 2</option>
+            </optgroup>
+            <optgroup label="Elegoo">
+              <option value="Centauri Carbon">Centauri Carbon</option>
+              <option value="Saturn 3 Ultra">Saturn 3 Ultra</option>
+              <option value="Mars 5 Ultra 9K">Mars 5 Ultra 9K</option>
+              <option value="Neptune 4 Pro">Neptune 4 Pro</option>
+              <option value="Neptune 4 Plus">Neptune 4 Plus</option>
+              <option value="Saturn 4 Ultra">Saturn 4 Ultra</option>
+            </optgroup>
+            <optgroup label="Flashforge">
+              <option value="Adventurer 5M Pro">Adventurer 5M Pro</option>
+              <option value="Adventurer 5M">Adventurer 5M</option>
+            </optgroup>
+            <optgroup label="Formlabs">
+              <option value="Form 4">Form 4</option>
+              <option value="Form 4L">Form 4L</option>
+              <option value="Form 3+">Form 3+</option>
+              <option value="Form 1">Form 1</option>
+              <option value="Form 1+">Form 1+</option>
+              <option value="Form 2">Form 2</option>
+              <option value="Form Auto">Form Auto</option>
+              <option value="Form Cell">Form Cell</option>
+            </optgroup>
+            <optgroup label="AnkerMake">
+              <option value="M5C">M5C</option>
+            </optgroup>
+            <optgroup label="QIDI">
+              <option value="Q1 Pro">Q1 Pro</option>
+              <option value="Plus4">Plus4</option>
+            </optgroup>
+            <optgroup label="Sovol">
+              <option value="SV06 Plus ACE">SV06 Plus ACE</option>
+              <option value="SV08">SV08</option>
+            </optgroup>
+            <optgroup label="Ultimaker">
+              <option value="S5">S5</option>
+            </optgroup>
+            <optgroup label="LulzBot">
+              <option value="Mini 2">Mini 2</option>
+              <option value="TAZ">TAZ</option>
+            </optgroup>
+            <optgroup label="Toybox Labs">
+              <option value="Toybox 3D Printer">Toybox 3D Printer</option>
+            </optgroup>
+            <optgroup label="Snapmaker">
+              <option value="Artisan">Artisan</option>
+            </optgroup>
+            <optgroup label="Uniformation">
+              <option value="GKTwo">GKTwo</option>
+            </optgroup>
+            <optgroup label="FLSun">
+              <option value="T1">T1</option>
+            </optgroup>
+            <optgroup label="MakerBot">
+              <option value="Replicator">Replicator</option>
+              <option value="Replicator 2">Replicator 2</option>
+              <option value="Replicator+">Replicator+</option>
+              <option value="Cupcake CNC">Cupcake CNC</option>
+            </optgroup>
+            <optgroup label="Fusion3">
+              <option value="F306 (Single & Dual Extruder)">F306 (Single & Dual Extruder)</option>
+              <option value="F410">F410</option>
+              <option value="EDGE">EDGE</option>
+            </optgroup>
+            <optgroup label="envisionTEC">
+              <option value="Micro Plus Hi-Res">Micro Plus Hi-Res</option>
+              <option value="Perfactory Apollo">Perfactory Apollo</option>
+            </optgroup>
+            <optgroup label="Hyrel 3D">
+              <option value="Engine">Engine</option>
+              <option value="System 30">System 30</option>
+            </optgroup>
+            <optgroup label="Cellink">
+              <option value="BIO X">BIO X</option>
+            </optgroup>
+            <optgroup label="Tina2S">
+              <option value="Tina2S">Tina2S</option>
+            </optgroup>
+          </select>
+          <label>Cost of Printer ($)</label>
+          <input type="number" id="new-printer-price" step="0.01" required>
           <button type="submit" class="primary">Add Printer</button>
         </fieldset>
       </form>
@@ -384,24 +519,29 @@ const brandTypes = {
   "Overture": ["PLA", "PETG", "TPU", "ABS"]
 };
 
-document.getElementById('new-filament-brand').addEventListener('change', function() {
+document.getElementById('filament-brand-select').addEventListener('change', function () {
   const brand = this.value;
-  const typeSelect = document.getElementById('new-filament-type');
+  const typeSelect = document.getElementById('filament-select');
   typeSelect.innerHTML = ''; // Clear previous options
 
-  if (brand && brandTypes[brand]) {
-    brandTypes[brand].forEach(type => {
+  filamentsRef.once('value', (snapshot) => {
+    const filaments = Object.values(snapshot.val() || {});
+    const filteredFilaments = filaments.filter((f) => f.brand === brand);
+
+    if (filteredFilaments.length > 0) {
+      filteredFilaments.forEach((f) => {
+        const option = document.createElement('option');
+        option.value = f.type;
+        option.textContent = `${f.type} (${f.brand}) ($${(f.costPerG * 1000).toFixed(2)}/kg)`;
+        typeSelect.appendChild(option);
+      });
+    } else {
       const option = document.createElement('option');
-      option.value = type;
-      option.textContent = type;
+      option.value = '';
+      option.textContent = 'No filaments available for this brand';
       typeSelect.appendChild(option);
-    });
-  } else {
-    const option = document.createElement('option');
-    option.value = '';
-    option.textContent = 'Select a brand first';
-    typeSelect.appendChild(option);
-  }
+    }
+  });
 });
 
 
@@ -423,25 +563,29 @@ document.getElementById('new-filament-brand').addEventListener('change', functio
   $('print-time-duplicate').value = $('print-time').value;
 });
 
-    function populatePrintersList(printers) {
+function populatePrintersList(printers) {
   const tbody = $('printer-table');
   const select = $('printer-select');
   tbody.innerHTML = '';
   select.innerHTML = '';
-  const isAdmin = !!auth.currentUser;        // ← add this line
+  const isAdmin = !!auth.currentUser;
 
   printers.forEach(p => {
+    // Calculate cost$/h = (Cost of Printer × 60%) / 4000
+    const costPerHour = ((p.price * 0.6) / 4000).toFixed(3);
+
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${p.name}</td>
-      <td>$${p.costPerHour.toFixed(3)}</td>
+      <td>$${costPerHour}/h</td>
       ${isAdmin
         ? `<td><button onclick="deletePrinter('${p.name}')">Delete</button></td>`
-        : `<td></td>`
-      }
+        : `<td></td>`}
     `;
     tbody.appendChild(tr);
-    select.append(new Option(`${p.name} ($${p.costPerHour.toFixed(3)}/h)`, p.name));
+
+    // Add the printer to the dropdown
+    select.append(new Option(`${p.name} ($${costPerHour}/h)`, p.name));
   });
 }
 function populateFilamentsList(filaments) {
@@ -481,12 +625,12 @@ function populateFilamentsList(filaments) {
 
     // Add / delete
     $('add-printer-form').addEventListener('submit', e => {
-      e.preventDefault();
-      const name = $('new-printer-name').value;
-      const costPerHour = parseFloat($('new-printer-cost').value);
-      printersRef.push({ name, costPerHour });
-      e.target.reset();
-    });
+  e.preventDefault();
+  const name = $('new-printer-name').value; // Get the selected printer name
+  const price = parseFloat($('new-printer-price').value); // Get the printer price
+  printersRef.push({ name, price }); // Save the printer with its price
+  e.target.reset();
+});
     $('add-filament-form').addEventListener('submit', e => {
       e.preventDefault();
       const type = $('new-filament-type').value;
