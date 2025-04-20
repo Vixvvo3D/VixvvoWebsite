@@ -712,6 +712,9 @@ filamentsRef.push({ type, brand, costPerG });
   const printerName = $('printer-select').value;
   const filamentType = $('filament-select').value;
 
+  if (!printerName) return alert("Please select a printer.");
+  if (!filamentType) return alert("Please select a filament.");
+
   printersRef.orderByChild('name').equalTo(printerName).once('value', snap => {
     if (!snap.val()) return alert("Printer not found.");
     const p = Object.values(snap.val())[0];
@@ -720,49 +723,37 @@ filamentsRef.push({ type, brand, costPerG });
       if (!snap2.val()) return alert("Filament not found.");
       const f = Object.values(snap2.val())[0];
 
-      // Inputs
-      const pt = +$('print-time').value; // Print Time in hours
-      const w  = +$('weight').value / 1000; // Weight in kilograms
-      const electricityPrice = +$('electricity-cost').value; // $/kWh
-      const electricityUsagePerHour = 0.1; // typical printer usage (kWh/h)
+      const pt = parseFloat($('print-time').value) || 0;
+      const w = parseFloat($('weight').value) / 1000 || 0;
+      const electricityPrice = parseFloat($('electricity-cost').value) || 0;
+      const electricityUsagePerHour = 0.1;
       const costElectric = pt * electricityUsagePerHour * electricityPrice;
 
-      const jr = +$('job-removal').value / 60; // mins to hours
-      const sr = +$('support-removal').value / 60;
-      const aw = +$('additional-work').value / 60;
-      const mp = +$('model-prep').value / 60;
-      const sl = +$('slicing').value / 60;
-      const mc = +$('material-change').value / 60;
-      const ts = +$('transfer-start').value / 60;
+      const jr = parseFloat($('job-removal').value) / 60 || 0;
+      const sr = parseFloat($('support-removal').value) / 60 || 0;
+      const aw = parseFloat($('additional-work').value) / 60 || 0;
+      const mp = parseFloat($('model-prep').value) / 60 || 0;
+      const sl = parseFloat($('slicing').value) / 60 || 0;
+      const mc = parseFloat($('material-change').value) / 60 || 0;
+      const ts = parseFloat($('transfer-start').value) / 60 || 0;
 
-      const fm = +$('filament-markup').value;
-      const gm = +$('general-markup').value / 100;
-      const fr = +$('failure-rate').value / 100;
+      const fm = parseFloat($('filament-markup').value) || 1;
+      const gm = parseFloat($('general-markup').value) / 100 || 0;
+      const fr = parseFloat($('failure-rate').value) / 100 || 0;
 
-      // Cost Calculations
+      // 🛠 Fixed this part
+      const costPerHour = (p.price * 0.6) / 4000;
+      const costPrinter = costPerHour * pt;
 
-      // Printer Depreciation
-      const costPrinter = p.costPerHour * pt;
+      const costFilament = f.costPerG * 1000 * w * fm;
 
-      // Filament
-      const costFilament = f.costPerG * 1000 * w * fm; // multiplied by filament markup
-
-      // Subtotal
       const subtotal = costPrinter + costFilament + costElectric;
 
-      // General Markup
       const generalMarkupAmount = subtotal * gm;
-
-      // Subtotal with Markup
       const subtotalWithMarkup = subtotal + generalMarkupAmount;
-
-      // Failure Rate
       const failureRateAmount = subtotalWithMarkup * fr;
-
-      // Final Price
       const finalPrice = subtotalWithMarkup + failureRateAmount;
 
-      // Display
       const r = $('results');
       r.innerHTML = `
         <p>Printer Depreciation: $${costPrinter.toFixed(2)}</p>
@@ -778,6 +769,7 @@ filamentsRef.push({ type, brand, costPerG });
     });
   });
 }
+
   </script>
 </body>
 </html>
