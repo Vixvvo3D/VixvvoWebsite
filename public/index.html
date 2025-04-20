@@ -248,7 +248,14 @@
     <div id="printers-tab" class="tab-content">
       <h2>Manage Printers</h2>
       <table>
-        <thead><tr><th>Name</th><th>Cost$/hr</th><th>Actions</th></tr></thead>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Full Price ($)</th> <!-- New column for full price -->
+            <th>Cost$/hr</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
         <tbody id="printer-table"></tbody>
       </table>
       <form id="add-printer-form">
@@ -570,13 +577,38 @@ function populatePrintersList(printers) {
   select.innerHTML = '';
   const isAdmin = !!auth.currentUser;
 
+  // Extract brand from the dropdown
+  const printerBrands = {};
+  const printerDropdown = $('new-printer-name');
+  Array.from(printerDropdown.options).forEach(option => {
+    if (option.parentElement.tagName === 'OPTGROUP') {
+      const brand = option.parentElement.label;
+      printerBrands[option.value] = brand;
+    }
+  });
+
+  // Add brand to each printer object
   printers.forEach(p => {
+    p.brand = printerBrands[p.name] || 'Unknown';
+  });
+
+  // Sort printers by brand and then by name alphabetically
+  const sortedPrinters = printers.sort((a, b) => {
+    if (a.brand.toLowerCase() === b.brand.toLowerCase()) {
+      return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+    }
+    return a.brand.toLowerCase().localeCompare(b.brand.toLowerCase());
+  });
+
+  // Populate the table and dropdown
+  sortedPrinters.forEach(p => {
     // Calculate cost$/h = (Cost of Printer × 60%) / 4000
     const costPerHour = ((p.price * 0.6) / 4000).toFixed(3);
 
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td>${p.name}</td>
+      <td>${p.name} (${p.brand})</td> <!-- Add brand beside the name -->
+      <td>$${p.price.toFixed(2)}</td> <!-- Full price column -->
       <td>$${costPerHour}/h</td>
       ${isAdmin
         ? `<td><button onclick="deletePrinter('${p.name}')">Delete</button></td>`
