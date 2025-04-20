@@ -183,8 +183,15 @@
       <form id="calculator-form">
         <fieldset>
           <legend>Printer & Filament</legend>
-          <label for="printer-select">Printer Type</label>
-          <select id="printer-select"></select>
+          <label for="printer-brand-select">Printer Brand</label>
+<select id="printer-brand-select">
+  <option value="">Select a brand</option>
+</select>
+
+<label for="printer-select">Printer Type</label>
+<select id="printer-select">
+  <option value="">Select a printer</option>
+</select>
           <label for="filament-brand-select">Filament Brand</label>
 <select id="filament-brand-select">
   <option value="">Select a brand</option>
@@ -572,9 +579,11 @@ document.getElementById('filament-brand-select').addEventListener('change', func
 
 function populatePrintersList(printers) {
   const tbody = $('printer-table');
-  const select = $('printer-select');
+  const brandSelect = $('printer-brand-select'); // Reference to the Printer Brand dropdown
+  const typeSelect = $('printer-select'); // Reference to the Printer Type dropdown
   tbody.innerHTML = '';
-  select.innerHTML = '';
+  brandSelect.innerHTML = '<option value="">Select a brand</option>'; // Clear previous options and add default option
+  typeSelect.innerHTML = '<option value="">Select a printer</option>'; // Clear previous options and add default option
   const isAdmin = !!auth.currentUser;
 
   // Extract brand from the dropdown
@@ -592,17 +601,34 @@ function populatePrintersList(printers) {
     p.brand = printerBrands[p.name] || 'Unknown';
   });
 
-  // Sort printers by brand and then by name alphabetically
-  const sortedPrinters = printers.sort((a, b) => {
-    if (a.brand.toLowerCase() === b.brand.toLowerCase()) {
-      return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
-    }
-    return a.brand.toLowerCase().localeCompare(b.brand.toLowerCase());
+  // Get unique brands
+  const uniqueBrands = [...new Set(printers.map(p => p.brand))].sort();
+
+  // Populate the Printer Brand dropdown
+  uniqueBrands.forEach(brand => {
+    const option = document.createElement('option');
+    option.value = brand;
+    option.textContent = brand;
+    brandSelect.appendChild(option);
   });
 
-  // Populate the table and dropdown
-  sortedPrinters.forEach(p => {
-    // Calculate cost$/h = (Cost of Printer × 60%) / 4000
+  // Populate the Printer Type dropdown based on the selected brand
+  brandSelect.addEventListener('change', () => {
+    const selectedBrand = brandSelect.value;
+    typeSelect.innerHTML = '<option value="">Select a printer</option>'; // Clear previous options
+
+    const filteredPrinters = printers.filter(p => p.brand === selectedBrand || selectedBrand === '');
+    filteredPrinters.forEach(p => {
+      const costPerHour = ((p.price * 0.6) / 4000).toFixed(3);
+      const option = document.createElement('option');
+      option.value = p.name;
+      option.textContent = `${p.name} (${p.brand}) ($${costPerHour}/h)`;
+      typeSelect.appendChild(option);
+    });
+  });
+
+  // Populate the table
+  printers.forEach(p => {
     const costPerHour = ((p.price * 0.6) / 4000).toFixed(3);
 
     const tr = document.createElement('tr');
@@ -615,9 +641,6 @@ function populatePrintersList(printers) {
         : `<td></td>`}
     `;
     tbody.appendChild(tr);
-
-    // Add the printer to the dropdown
-    select.append(new Option(`${p.name} ($${costPerHour}/h)`, p.name));
   });
 }
 function populateFilamentsList(filaments) {
