@@ -551,11 +551,17 @@ filamentsRef.push({ type, brand, costPerG });
       // Subtotal
       const subtotal = costPrinter + costFilament + costElectric;
 
-      // Add markup
-      const subtotalWithMarkup = subtotal * (1 + gm);
+      // General Markup
+      const generalMarkupAmount = subtotal * gm;
 
-      // Add failure rate
-      const finalPrice = subtotalWithMarkup / (1 - fr);
+      // Subtotal with Markup
+      const subtotalWithMarkup = subtotal + generalMarkupAmount;
+
+      // Failure Rate
+      const failureRateAmount = subtotalWithMarkup * fr;
+
+      // Final Price
+      const finalPrice = subtotalWithMarkup + failureRateAmount;
 
       // Display
       const r = $('results');
@@ -565,8 +571,8 @@ filamentsRef.push({ type, brand, costPerG });
         <p>Electricity: $${costElectric.toFixed(2)}</p>
         <hr>
         <p>Subtotal (before markup): $${subtotal.toFixed(2)}</p>
-        <p>+ General Markup (${(gm * 100).toFixed(0)}%)</p>
-        <p>+ Failure Rate (${(fr * 100).toFixed(0)}%)</p>
+        <p>+ General Markup (${(gm * 100).toFixed(0)}%): $${generalMarkupAmount.toFixed(2)}</p>
+        <p>+ Failure Rate (${(fr * 100).toFixed(0)}%): $${failureRateAmount.toFixed(2)}</p>
         <hr>
         <p><strong>Total Price: $${finalPrice.toFixed(2)}</strong></p>
       `;
