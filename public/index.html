@@ -449,24 +449,33 @@ function populateFilamentsList(filaments) {
   const select = $('filament-select');
   tbody.innerHTML = '';
   select.innerHTML = '';
-  const isAdmin = !!auth.currentUser;     // ← add this line
+  const isAdmin = !!auth.currentUser;
 
-  filaments.forEach(f => {
+  // Sort filaments by brand and then by type alphabetically
+  const sortedFilaments = filaments.sort((a, b) => {
+    if (a.brand.toLowerCase() === b.brand.toLowerCase()) {
+      return a.type.toLowerCase().localeCompare(b.type.toLowerCase());
+    }
+    return a.brand.toLowerCase().localeCompare(b.brand.toLowerCase());
+  });
+
+  // Populate the table and dropdown
+  sortedFilaments.forEach(f => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${f.type}</td>
       <td>${f.brand}</td>
-      <td>$${(f.costPerG*1000).toFixed(2)}</td>
+      <td>$${(f.costPerG * 1000).toFixed(2)}</td>
       ${isAdmin
         ? `<td><button onclick="deleteFilament('${f.type}')">Delete</button></td>`
-        : `<td></td>`
-      }
+        : `<td></td>`}
     `;
     tbody.appendChild(tr);
-    select.append(new Option(
-      `${f.type} (${f.brand}) ($${(f.costPerG*1000).toFixed(2)}/kg)`,
-      f.type
-    ));
+
+    const option = document.createElement('option');
+    option.value = f.type;
+    option.textContent = `${f.type} (${f.brand}) ($${(f.costPerG * 1000).toFixed(2)}/kg)`;
+    select.appendChild(option);
   });
 }
 
